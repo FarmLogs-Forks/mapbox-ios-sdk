@@ -52,7 +52,8 @@ Pod::Spec.new do |m|
     'MapView/Map/RMTileCache.h',
     'MapView/Map/RMTileMillSource.h',
     'MapView/Map/RMUserLocation.h',
-    'MapView/Map/RMUserTrackingBarButtonItem.h'
+    'MapView/Map/RMUserTrackingBarButtonItem.h',
+    'MapView/Map/RMFoundation.h'
   ]
 
   m.resource_bundle = {
