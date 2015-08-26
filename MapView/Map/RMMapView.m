@@ -1883,7 +1883,7 @@ UIViewControllerAnimatedTransitioning>
 }
 
 - (void)handlePan:(UIPanGestureRecognizer *)recognizer {
-    if (recognizer.state == UIGestureRecognizerStateBegan) {
+    if (recognizer.state == UIGestureRecognizerStateBegan || !_draggedAnnotation) {
         CALayer *hit = [_overlayView overlayHitTest:[recognizer locationInView:self]];
         
         if ([hit isKindOfClass:[RMMapLayer class]] && [self shouldDragAnnotation:[((RMMapLayer *)hit) annotation]])
@@ -1908,7 +1908,7 @@ UIViewControllerAnimatedTransitioning>
             
             // inform the layer
             //
-            [_draggedAnnotation.layer setDragState:RMMapLayerDragStateStarting animated:YES];
+            //[_draggedAnnotation.layer setDragState:RMMapLayerDragStateStarting animated:YES];
             
             // bring to top
             //
@@ -1918,8 +1918,19 @@ UIViewControllerAnimatedTransitioning>
             
         }
         return;
-    }else if (_draggedAnnotation && recognizer.state == UIGestureRecognizerStateChanged && _draggedAnnotation.layer.dragState == RMMapLayerDragStateDragging)
+    }else if (recognizer.state == UIGestureRecognizerStateChanged)
     {
+        
+        if (!_draggedAnnotation) {
+            CALayer *hit = [_overlayView overlayHitTest:[recognizer locationInView:self]];
+            if ([hit isKindOfClass:[RMMapLayer class]] && [self shouldDragAnnotation:[((RMMapLayer *)hit) annotation]]) {
+                _draggedAnnotation = hit;
+            } else {
+                return;
+            }
+
+        }
+        
         // perform the drag (unanimated for fluidity)
         //
         [CATransaction begin];
@@ -1940,7 +1951,7 @@ UIViewControllerAnimatedTransitioning>
     {
         // cancel & go back to start point
         //
-        [_draggedAnnotation.layer setDragState:RMMapLayerDragStateCanceling animated:YES];
+        //[_draggedAnnotation.layer setDragState:RMMapLayerDragStateCanceling animated:YES];
         
         _draggedAnnotation.position = [self coordinateToPixel:_draggedAnnotation.coordinate];
         
@@ -1957,7 +1968,7 @@ UIViewControllerAnimatedTransitioning>
     {
         // complete drag & update coordinate
         //
-        [_draggedAnnotation.layer setDragState:RMMapLayerDragStateEnding animated:YES];
+        //[_draggedAnnotation.layer setDragState:RMMapLayerDragStateEnding animated:YES];
         
         _draggedAnnotation.coordinate = [self pixelToCoordinate:_draggedAnnotation.position];
         
