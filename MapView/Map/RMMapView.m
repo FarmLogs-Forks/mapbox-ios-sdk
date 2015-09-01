@@ -1412,7 +1412,7 @@ UIViewControllerAnimatedTransitioning>
     twoFingerSingleTapRecognizer.numberOfTouchesRequired = 2;
     twoFingerSingleTapRecognizer.delegate = self;
     
-    [self addGestureRecognizer:twoFingerSingleTapRecognizer];
+    //[self addGestureRecognizer:twoFingerSingleTapRecognizer];
     
     //pan
     if (_annotationDragGestureRecognizer) {
@@ -1883,7 +1883,7 @@ UIViewControllerAnimatedTransitioning>
 }
 
 - (void)handlePan:(UIPanGestureRecognizer *)recognizer {
-    if (recognizer.state == UIGestureRecognizerStateBegan || !_draggedAnnotation) {
+    if (recognizer.state == UIGestureRecognizerStateBegan && !_draggedAnnotation) {
         CALayer *hit = [_overlayView overlayHitTest:[recognizer locationInView:self]];
         
         if ([hit isKindOfClass:[RMMapLayer class]] && [self shouldDragAnnotation:[((RMMapLayer *)hit) annotation]])
@@ -1902,6 +1902,17 @@ UIViewControllerAnimatedTransitioning>
             //
             _draggedAnnotation = [((RMMapLayer *)hit) annotation];
             
+            //try doing this
+            [CATransaction begin];
+            [CATransaction setDisableActions:YES];
+            
+            CGSize layerSize = _draggedAnnotation.layer.bounds.size;
+            CGPoint gesturePoint = [recognizer locationInView:self];
+            CGPoint newPosition = CGPointMake(gesturePoint.x + ((layerSize.width / 2) - _dragOffset.x), gesturePoint.y + ((layerSize.height / 2) - _dragOffset.y));
+            
+            _draggedAnnotation.position = newPosition;
+            
+            [CATransaction commit];
             // remember where in the layer the gesture occurred
             //
             _dragOffset = [_draggedAnnotation.layer convertPoint:[recognizer locationInView:self] fromLayer:self.layer];
@@ -1961,7 +1972,7 @@ UIViewControllerAnimatedTransitioning>
         _mapScrollView.scrollEnabled = YES;
         
         if ([_delegate respondsToSelector:@selector(shouldEndUndoGrouping)]) {
-            [(NSObject*)_delegate performSelector:@selector(shouldEndUndoGrouping) withObject:nil afterDelay:0.1];
+            [(NSObject*)_delegate performSelector:@selector(shouldEndUndoGrouping) withObject:nil afterDelay:0];
         }
     }
     else if (_draggedAnnotation && recognizer.state == UIGestureRecognizerStateEnded)
@@ -1978,7 +1989,7 @@ UIViewControllerAnimatedTransitioning>
         _mapScrollView.scrollEnabled = YES;
         
         if ([_delegate respondsToSelector:@selector(shouldEndUndoGrouping)]) {
-            [(NSObject*)_delegate performSelector:@selector(shouldEndUndoGrouping) withObject:nil afterDelay:0.1];
+            [(NSObject*)_delegate performSelector:@selector(shouldEndUndoGrouping) withObject:nil afterDelay:0];
         }
     }
 
