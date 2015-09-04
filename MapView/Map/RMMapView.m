@@ -1405,7 +1405,7 @@ UIViewControllerAnimatedTransitioning>
     
     [self addGestureRecognizer:singleTapRecognizer];
     [self addGestureRecognizer:doubleTapRecognizer];
-    [self addGestureRecognizer:longPressRecognizer];
+    //[self addGestureRecognizer:longPressRecognizer];
     
     // two finger taps
     UITapGestureRecognizer *twoFingerSingleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerSingleTap:)];
@@ -1888,7 +1888,7 @@ UIViewControllerAnimatedTransitioning>
         
         if ([hit isKindOfClass:[RMMapLayer class]] && [self shouldDragAnnotation:[((RMMapLayer *)hit) annotation]])
         {
-            
+            NSLog(@"began");
             if ([_delegate respondsToSelector:@selector(shouldBeginUndoGrouping)]) {
                 [_delegate performSelector:@selector(shouldBeginUndoGrouping) withObject:nil];
             }
@@ -1934,7 +1934,7 @@ UIViewControllerAnimatedTransitioning>
         
         if (!_draggedAnnotation) {
             CALayer *hit = [_overlayView overlayHitTest:[recognizer locationInView:self]];
-            if ([hit isKindOfClass:[RMMapLayer class]] && [self shouldDragAnnotation:[((RMMapLayer *)hit) annotation]]) {
+            if ([hit isKindOfClass:[RMAnnotation class]] && [self shouldDragAnnotation:[((RMMapLayer *)hit) annotation]]) {
                 _draggedAnnotation = hit;
             } else {
                 return;
@@ -1970,12 +1970,12 @@ UIViewControllerAnimatedTransitioning>
         
         _draggedAnnotation = nil;
         _mapScrollView.scrollEnabled = YES;
-        
+        NSLog(@"canceled");
         if ([_delegate respondsToSelector:@selector(shouldEndUndoGrouping)]) {
             [(NSObject*)_delegate performSelector:@selector(shouldEndUndoGrouping) withObject:nil afterDelay:0];
         }
     }
-    else if (_draggedAnnotation && recognizer.state == UIGestureRecognizerStateEnded)
+    else if (_draggedAnnotation && (recognizer.state == UIGestureRecognizerStateEnded || recognizer.state == UIGestureRecognizerStateFailed))
     {
         // complete drag & update coordinate
         //
@@ -1987,7 +1987,7 @@ UIViewControllerAnimatedTransitioning>
         
         _draggedAnnotation = nil;
         _mapScrollView.scrollEnabled = YES;
-        
+        NSLog(@"ended or failed");
         if ([_delegate respondsToSelector:@selector(shouldEndUndoGrouping)]) {
             [(NSObject*)_delegate performSelector:@selector(shouldEndUndoGrouping) withObject:nil afterDelay:0];
         }
