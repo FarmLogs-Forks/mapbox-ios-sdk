@@ -1906,18 +1906,8 @@ UIViewControllerAnimatedTransitioning>
             
         }
         return;
-    }else if (recognizer.state == UIGestureRecognizerStateChanged)
+    }else if (_draggedAnnotation && recognizer.state == UIGestureRecognizerStateChanged)
     {
-        
-        if (!_draggedAnnotation) {
-            CALayer *hit = [_overlayView overlayHitTest:[recognizer locationInView:self]];
-            if ([hit isKindOfClass:[RMAnnotation class]] && [self shouldDragAnnotation:[((RMMapLayer *)hit) annotation]]) {
-                _draggedAnnotation = hit;
-            } else {
-                return;
-            }
-
-        }
         
         // perform the drag (unanimated for fluidity)
         //
@@ -4205,6 +4195,10 @@ UIViewControllerAnimatedTransitioning>
          
          [transitionContext completeTransition:YES];
      }];
+}
+
+-(void)setDraggedAnnotation:(RMAnnotation *)annotation {
+    _draggedAnnotation = annotation;
 }
 
 @end
